@@ -8,8 +8,6 @@ global editorWindow
 
 english_field="english word"
 english_definitions_field="english definition"
-german_translation_field="german translation"
-german_translation_field_alternative="alternative translations"
 pronunciation_field="pronunciation (sound)"
 etymology_field="etymology"
 difficulty_score_field="difficulty/frequency"
@@ -53,37 +51,6 @@ def fill_the_fields(flag):
 
     search_string=mw.col.media.strip(n[english_field])
 
-    #API 1 - german-english translation
-    try:
-
-        url = "https://petapro-translate-v1.p.rapidapi.com/"
-
-        params = {"query":search_string,"langpair":"en-de"}
-
-        headers = {
-        'x-rapidapi-host': "petapro-translate-v1.p.rapidapi.com",
-        'x-rapidapi-key': petapro_api_key
-        }
-        r=requests.get(url=url,params=params,headers=headers)
-        r=r.json()
-        n[german_translation_field]=r[0]["l1_text"]
-    except:
-        n[german_translation_field]="_"
-    
-    i=1
-    gerstring=""
-
-    while True:
-        try:
-            gerstring=gerstring+ r[i]["l1_text"] +"<br>"
-            i=i+1
-            pass
-            if i==5:
-                break
-        except:
-            break
-    n[german_translation_field_alternative]=gerstring
-    
     #API 2 more information about the english word
     word_id=search_string
     url = 'https://od-api.oxforddictionaries.com/api/v2/entries/'  + uk_or_us + '/'  + word_id.lower()
@@ -194,7 +161,7 @@ def menu_popup(self,menu):
     
     global editorWindow
     editorWindow=self
-    a=menu.addAction("Fill with English information")
+    a=menu.addAction("Ausfüllen")
     a.triggered.connect(fill_the_fields)
 
 addHook('EditorWebView.contextMenuEvent', menu_popup)
