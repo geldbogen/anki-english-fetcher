@@ -161,7 +161,7 @@ def menu_popup(self,menu):
     
     global editorWindow
     editorWindow=self
-    a=menu.addAction("Ausfüllen")
+    a=menu.addAction("Fill with English information")
     a.triggered.connect(fill_the_fields)
 
 addHook('EditorWebView.contextMenuEvent', menu_popup)
