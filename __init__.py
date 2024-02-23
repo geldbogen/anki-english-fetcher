@@ -73,7 +73,7 @@ def fill_the_fields(flag):
             i += 1
         except:
             break
-    n[english_definitions_field] = english_definitions
+    n[english_definitions_field] = str(english_definitions)
     i = 0
     example_sentences = ""
     examples_prepared = ""
@@ -87,8 +87,8 @@ def fill_the_fields(flag):
             i += 1
         except:
             break
-    n[examples_prepared_field] = examples_prepared
-    n[example_sentences_entry] = example_sentences
+    n[examples_prepared_field] = str(examples_prepared)
+    n[example_sentences_entry] = str(example_sentences)
     i = 0
     etymology = ""
     while True:
@@ -128,16 +128,16 @@ def fill_the_fields(flag):
                     "_us_1.mp3", "wb") as f:
                 f.write(doc.content)
         elif platform == 'darwin':
+            filepath = os.path.join('/Users','juliusniemeyer','Library','Application Support','Anki2',ankiusername,'collection.media',search_string + '_us_1.mp3')
             with open(
-                    "/Users/" + windowsusername + "/Library/Application Support/Anki2/" + ankiusername + "/collection.media/" + search_string +
-                    "_us_1.mp3", "wb") as f:
+                    filepath, "wb") as f:
                 f.write(doc.content)
     except Exception as e:
-        n[pronunciation_field] = e.args[0]
+        n[pronunciation_field] = str(e.args)
     else:
         n[pronunciation_field] = "[sound:" + search_string + "_us_1.mp3]"
 
-    n[etymology_field] = etymology
+    n[etymology_field] = str(etymology)
     #API 3
     try:
         url = "https://twinword-language-scoring.p.rapidapi.com/word/"
@@ -166,15 +166,15 @@ def fill_the_fields(flag):
     r = requests.get(url=urbanendpoint, params=params, headers=headers)
     r = r.json()
     try:
-        n[slang_information_field] = r["list"][0]["definition"]
+        n[slang_information_field] = str(r["list"][0]["definition"])
     except:
         pass
     try:
-        n[slang_example_field] = r["list"][0]["example"]
+        n[slang_example_field] = str(r["list"][0]["example"])
     except:
         pass
     try:
-        n[slang_url_field] = r["list"][0]["permalink"]
+        n[slang_url_field] = str(r["list"][0]["permalink"])
     except:
         pass
 
