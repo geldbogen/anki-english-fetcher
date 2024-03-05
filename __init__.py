@@ -17,9 +17,8 @@ slang_example_field = "slang example sentences"
 slang_url_field = "urbandictionary-url"
 example_sentences_entry = "example sentences"
 examples_prepared_field = "prepared sentences"
-german_translation_field="german translation"
-german_translation_field_alternative="alternative translations"
-
+german_translation_field = "german translation"
+german_translation_field_alternative = "alternative translations"
 
 # import the addon's config file
 config = mw.addonManager.getConfig(__name__)
@@ -66,31 +65,31 @@ def fill_the_fields(flag):
 
         url = "https://petapro-translate-v1.p.rapidapi.com/"
 
-        params = {"query":search_string,"langpair":"en-de"}
+        params = {"query": search_string, "langpair": "en-de"}
 
         headers = {
-        'x-rapidapi-host': "petapro-translate-v1.p.rapidapi.com",
-        'x-rapidapi-key': petapro_api_key
+            'x-rapidapi-host': "petapro-translate-v1.p.rapidapi.com",
+            'x-rapidapi-key': petapro_api_key
         }
-        r=requests.get(url=url,params=params,headers=headers)
-        r=r.json()
-        n[german_translation_field]=r[0]["l1_text"]
+        r = requests.get(url=url, params=params, headers=headers)
+        r = r.json()
+        n[german_translation_field] = r[0]["l1_text"]
     except:
-        n[german_translation_field]="_"
-    
-    i=1
-    gerstring=""
+        n[german_translation_field] = "_"
+
+    i = 1
+    gerstring = ""
 
     while True:
         try:
-            gerstring=gerstring+ r[i]["l1_text"] +"<br>"
-            i=i+1
+            gerstring = gerstring + r[i]["l1_text"] + "<br>"
+            i = i + 1
             pass
-            if i==5:
+            if i == 5:
                 break
         except:
             break
-    n[german_translation_field_alternative]=gerstring
+    n[german_translation_field_alternative] = gerstring
 
     #API 2 more information about the english word
     word_id = search_string
@@ -162,9 +161,11 @@ def fill_the_fields(flag):
                     "_us_1.mp3", "wb") as f:
                 f.write(doc.content)
         elif platform == 'darwin':
-            filepath = os.path.join('/Users','juliusniemeyer','Library','Application Support','Anki2',ankiusername,'collection.media',search_string + '_us_1.mp3')
-            with open(
-                    filepath, "wb") as f:
+            filepath = os.path.join('/Users', 'juliusniemeyer', 'Library',
+                                    'Application Support', 'Anki2',
+                                    ankiusername, 'collection.media',
+                                    search_string + '_us_1.mp3')
+            with open(filepath, "wb") as f:
                 f.write(doc.content)
     except Exception as e:
         n[pronunciation_field] = str(e.args)
