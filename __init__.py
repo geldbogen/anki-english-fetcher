@@ -31,7 +31,7 @@ windowsusername = os.getlogin()
 ankiusername = config["Anki username"]
 
 # get key for ger-eng API
-marriam_webster_api_key = config[
+twinword_key = config[
     "Petapro API Key (https://rapidapi.com/petapro/api/linguatools-translate)"]
 
 # get key for Marriam Webster
