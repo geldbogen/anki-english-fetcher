@@ -99,11 +99,10 @@ def fill_the_fields(flag):
             break
     n[german_translation_field_alternative] = gerstring
 
-    # API 2 more information about the English word
+    # API 2 Marriam-Webster more information about the English word
     n[english_definitions_field] = algo.get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[0]
     n[examples_prepared_field] = algo.get_example_sentence(search_string)[0]
     n[example_sentences_entry] = algo.get_example_sentence(search_string)[1]
-    
     soundurl = algo.get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[1]
     
     try:
@@ -174,11 +173,9 @@ def fill_the_fields(flag):
 
 
 def menu_popup(self, menu):
-
     global editorWindow
     editorWindow = self
     a = menu.addAction("Fill with English information")
     a.triggered.connect(fill_the_fields)
-
 
 addHook('EditorWebView.contextMenuEvent', menu_popup)
