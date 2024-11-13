@@ -6,7 +6,7 @@ word = word.replace(' ', '%20')
 
 # my_html = requests.get(f'https://www.merriam-webster.com/dictionary/{word}').content
 # print(my_html)
-# soup = BeautifulSoup(my_html, 'html.parser')
+soup = BeautifulSoup(my_html, 'html.parser')
 
 # bb = soup.find_all('span', attrs= {'class':['sub-content-thread', 'ex-sent', 'sents']})
 # print(bb)
@@ -23,7 +23,7 @@ word = word.replace(' ', '%20')
 # print(bb)
 # quit()
 
-key = ''
+key = 'bfe1db9c-c8be-4476-a4a7-029e5c31fb08'
 word = 'vegetable'
 
 
