@@ -5,6 +5,8 @@ import requests
 import os
 from sys import platform
 
+import algorithms as algo
+
 global editorWindow
 
 english_field = "english word"
@@ -30,14 +32,20 @@ windowsusername = os.getlogin()
 ankiusername = config["Anki username"]
 
 # get key for ger-eng API
-petapro_api_key = config[
+marriam_webster_api_key = config[
     "Petapro API Key (https://rapidapi.com/petapro/api/linguatools-translate)"]
+
+# get key for Marriam Webster
+marriam_webster_api_key = config[
+    "Marriam Webster API key (https://dictionaryapi.com/)"]
 
 # get key and ID for Oxford API
 ox_key = config[
     "Oxford Dictionary API Key (https://developer.oxforddictionaries.com/)"]
 ox_id = config[
     "Oxford Dictionary API ID (https://developer.oxforddictionaries.com/)"]
+
+
 
 # get UK or US:
 if config["UK or US"] == "UK":
@@ -69,7 +77,7 @@ def fill_the_fields(flag):
 
         headers = {
             'x-rapidapi-host': "petapro-translate-v1.p.rapidapi.com",
-            'x-rapidapi-key': petapro_api_key
+            'x-rapidapi-key': marriam_webster_api_key
         }
         r = requests.get(url=url, params=params, headers=headers)
         r = r.json()
@@ -91,7 +99,7 @@ def fill_the_fields(flag):
             break
     n[german_translation_field_alternative] = gerstring
 
-    #API 2 more information about the english word
+    # API 2 more information about the English word
     word_id = search_string
     url = 'https://od-api.oxforddictionaries.com/api/v2/entries/' + uk_or_us + '/' + word_id.lower(
     )
@@ -106,50 +114,14 @@ def fill_the_fields(flag):
             i += 1
         except:
             break
-    n[english_definitions_field] = str(english_definitions)
-    i = 0
-    example_sentences = ""
-    examples_prepared = ""
-    while True:
-        try:
-            example_sentences += r["results"][0]["lexicalEntries"][0][
-                "entries"][0]["senses"][0]["examples"][i]["text"] + "<br> <br>"
-            examples_prepared += r["results"][0]["lexicalEntries"][0][
-                "entries"][0]["senses"][0]["examples"][i]["text"] + "<br> <br>"
-            examples_prepared = examples_prepared.replace(search_string, "___")
-            i += 1
-        except:
-            break
-    n[examples_prepared_field] = str(examples_prepared)
-    n[example_sentences_entry] = str(example_sentences)
-    i = 0
-    etymology = ""
-    while True:
-        try:
-            etymology += r["results"][0]["lexicalEntries"][0]["entries"][0][
-                "etymologies"][i] + "<br>"
-            i += 1
-        except:
-            break
-    soundurl = ""
-    i = -1
-    while True:
-        try:
-            i += 1
-            soundurl = soundurl + r["results"][0]["lexicalEntries"][0][
-                "entries"][0]["pronunciations"][i]["audioFile"]
-            break
-        except IndexError:
-            break
-        except JSONDecodeError:
-            break
-        except KeyError as e:
-            if e.args[0] == "results":
-                break
-            else:
-                continue
-        except:
-            break
+
+
+    n[english_definitions_field] = algo.get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[0]
+    n[examples_prepared_field] = algo.get_example_sentence(search_string)[0]
+    n[example_sentences_entry] = algo.get_example_sentence(search_string)[1]
+    
+    soundurl = algo.get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[1]
+    
     try:
         url = soundurl
         print(soundurl)
@@ -172,8 +144,7 @@ def fill_the_fields(flag):
     else:
         n[pronunciation_field] = "[sound:" + search_string + "_us_1.mp3]"
 
-    n[etymology_field] = str(etymology)
-    #API 3
+    # API 3
     try:
         url = "https://twinword-language-scoring.p.rapidapi.com/word/"
 
@@ -191,7 +162,9 @@ def fill_the_fields(flag):
             n[difficulty_score_field] = ""
     except:
         n[difficulty_score_field] = ""
-    #API 4 urban dictionary
+    
+    
+    # API 4 urban dictionary
     urbanendpoint = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
     params = {"term": search_string}
     headers = {
