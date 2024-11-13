@@ -95,7 +95,7 @@ def get_example_sentence(word : str) -> list[str]:
 
             
     final_string_prepared = ''.join([ex.strip() + '<br><br>' for ex in (marriam_example_sentence_list + web_example_sentence_list)[:3]])
-    final_string_pure = ''.join([ex.strip() + '\n\n' for ex in (pure_marriam_example_sentence_list + pure_web_example_sentence_list)[:3]])
+    final_string_pure = ''.join([ex.strip() + '<br><br>' for ex in (pure_marriam_example_sentence_list + pure_web_example_sentence_list)[:3]])
 
     return [final_string_prepared, final_string_pure]
 
