@@ -100,22 +100,6 @@ def fill_the_fields(flag):
     n[german_translation_field_alternative] = gerstring
 
     # API 2 more information about the English word
-    word_id = search_string
-    url = 'https://od-api.oxforddictionaries.com/api/v2/entries/' + uk_or_us + '/' + word_id.lower(
-    )
-    r = requests.get(url, headers={'app_id': ox_id, 'app_key': ox_key})
-    r = r.json()
-    i = 0
-    english_definitions = ""
-    while True:
-        try:
-            english_definitions += r["results"][0]["lexicalEntries"][0][
-                "entries"][0]["senses"][i]["definitions"][0] + "<br> <br>"
-            i += 1
-        except:
-            break
-
-
     n[english_definitions_field] = algo.get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[0]
     n[examples_prepared_field] = algo.get_example_sentence(search_string)[0]
     n[example_sentences_entry] = algo.get_example_sentence(search_string)[1]
