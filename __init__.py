@@ -38,6 +38,10 @@ twinword_key = config[
 marriam_webster_api_key = config[
     "Marriam Webster API key (https://dictionaryapi.com/)"]
 
+# get key for DeepL
+deepl_api_key = config[
+    "DeepL API Key (https://support.deepl.com/hc/en-us/articles/360021200939-DeepL-API-Free)"]
+
 # get key and ID for Oxford API
 ox_key = config[
     "Oxford Dictionary API Key (https://developer.oxforddictionaries.com/)"]
@@ -60,7 +64,22 @@ twinword_key = config[
 urban_key = config[
     "Urban Dictionary API Key (https://rapidapi.com/community/api/urban-dictionary)"]
 
-# import algorithms as algo
+def get_deepl_translation(word :str, key: str) -> str:
+    
+    r = requests.post(
+                url="https://api-free.deepl.com/v2/translate",
+                data={
+                    'source_lang' : "EN",
+                    "target_lang": "DE",
+                    "auth_key": key,
+                    "text": word,
+                },
+            )
+    try:
+        return r.json()['translations'][0]['text']
+    except:
+        return ''
+
 def get_example_sentence(word : str) -> list[str]:
 
     word = word.replace(' ', '%20')
@@ -129,36 +148,9 @@ def fill_the_fields(flag):
 
     search_string = mw.col.media.strip(n[english_field])
 
-    #API 1 - german-english translation
-    try:
-
-        url = "https://petapro-translate-v1.p.rapidapi.com/"
-
-        params = {"query": search_string, "langpair": "en-de"}
-
-        headers = {
-            'x-rapidapi-host': "petapro-translate-v1.p.rapidapi.com",
-            'x-rapidapi-key': marriam_webster_api_key
-        }
-        r = requests.get(url=url, params=params, headers=headers)
-        r = r.json()
-        n[german_translation_field] = r[0]["l1_text"]
-    except:
-        n[german_translation_field] = "_"
-
-    i = 1
-    gerstring = ""
-
-    while True:
-        try:
-            gerstring = gerstring + r[i]["l1_text"] + "<br>"
-            i = i + 1
-            pass
-            if i == 5:
-                break
-        except:
-            break
-    n[german_translation_field_alternative] = gerstring
+    #API 1 - German-English translation
+    
+    n[german_translation_field] = get_deepl_translation(search_string, deepl_api_key)
 
     # API 2 Marriam-Webster more information about the English word
     

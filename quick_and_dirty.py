@@ -26,13 +26,13 @@ word = word.replace(' ', '%20')
 
 deepl_api_key = 'f1dde53b-ff5f-4295-b00a-88cfe1f6a376:fx'
 
-# r = requests.post(
-#                 url="https://api-free.deepl.com/v2/translate",
-#                 data={
-#                     'source_lang' : "EN",
-#                     "target_lang": "DE",
-#                     "auth_key": deepl_api_key,
-#                     "text": 'imbecile',
-#                 },
-#             )
-# print(r.json())
+r = requests.post(
+                url="https://api-free.deepl.com/v2/translate",
+                data={
+                    'source_lang' : "EN",
+                    "target_lang": "DE",
+                    "auth_key": deepl_api_key,
+                    "text": 'imbecile',
+                },
+            )
+print(r.json()['translations'][0]['text'])
