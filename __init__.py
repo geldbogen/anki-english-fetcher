@@ -5,6 +5,7 @@ import requests
 import os
 from sys import platform
 from bs4 import BeautifulSoup
+import marriam_webster_fetch
 
 global editorWindow
 
@@ -127,8 +128,11 @@ def get_stuff_from_marriam_webster(word : str, key : str) -> list[str]:
 
     # print(response.json())
 
+    if not r or isinstance(r[0], str):
+        return ["Definition not found", ""]
+
     sound_file_name = r
-    short_def_list = r[0]['shortdef']
+    short_def_list = r[0].get('shortdef', [])
     short_def = ''.join([item + '\n' for item in short_def_list])
 
     try:
@@ -154,7 +158,7 @@ def fill_the_fields(flag):
 
     # API 2 Marriam-Webster more information about the English word
     
-    n[english_definitions_field] = get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[0]
+    n[english_definitions_field] = marriam_webster_fetch.get_short_definition(search_string)
     n[examples_prepared_field] = get_example_sentence(search_string)[0]
     n[example_sentences_entry] = get_example_sentence(search_string)[1]
     soundurl = get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[1]
