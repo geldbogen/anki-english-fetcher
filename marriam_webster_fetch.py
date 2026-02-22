@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import sys
 
-def get_short_definition(word: str) -> str:
+def get_short_definition(word: str) -> tuple[str, str]:
     # Construct the URL
     url = f'https://www.merriam-webster.com/dictionary/{word}'
     print(f"Fetching: {url}")
@@ -12,7 +12,7 @@ def get_short_definition(word: str) -> str:
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Error fetching page: {e}")
-        return ""
+        return "", ""
 
     soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -44,7 +44,18 @@ def get_short_definition(word: str) -> str:
             else:
                 definitions.append(content)
 
-    return "\n".join(definitions)
+    # Method 3: Get pronunciation audio URL
+    sound_url = ""
+    play_button = soup.find('a', class_='play-pron-v2')
+    if play_button and play_button.has_attr('data-file'):
+        sound_file_name = play_button['data-file']
+        # The directory is usually the first letter of the file name, or 'gg' if it starts with 'gg', etc.
+        # But Merriam-Webster API uses the first letter or specific rules.
+        # The data-dir attribute sometimes exists, but if not, we can fallback to the first letter.
+        sound_dir = play_button.get('data-dir', sound_file_name[0].lower())
+        sound_url = f'https://media.merriam-webster.com/audio/prons/en/us/mp3/{sound_dir}/{sound_file_name}.mp3'
+
+    return "\n".join(definitions), sound_url
 
 if __name__ == "__main__":
     # Allow command line argument for the word
@@ -53,10 +64,16 @@ if __name__ == "__main__":
     else:
         search_word = 'vegetable' # Default word
 
-    result_string = get_short_definition(search_word)
+    result_string, sound_url = get_short_definition(search_word)
     
     print(f"\n--- Short Definitions for '{search_word}' ---")
     if result_string:
         print(result_string)
     else:
         print("No definitions found.")
+        
+    print(f"\n--- Pronunciation URL ---")
+    if sound_url:
+        print(sound_url)
+    else:
+        print("No pronunciation found.")
