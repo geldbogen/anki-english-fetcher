@@ -234,29 +234,32 @@ def fill_the_fields(flag):
     n[english_definitions_field] = get_short_definition(search_string)
     n[examples_prepared_field] = get_example_sentence(search_string)[0]
     n[example_sentences_entry] = get_example_sentence(search_string)[1]
+    
+    # Fetch the pronunciation URL or error message
     soundurl = get_pronunciation(search_string)
     
-    try:
-        url = soundurl
-        print(soundurl)
-        doc = requests.get(url, headers={'app_id': ox_id, 'app_key': ox_key})
-        if platform == 'win64' or platform == 'win32':
-            with open(
-                    "C:/Users/" + windowsusername + "/AppData/Roaming/Anki2/" +
-                    ankiusername + "/collection.media/" + search_string +
-                    "_us_1.mp3", "wb") as f:
-                f.write(doc.content)
-        elif platform == 'darwin':
-            filepath = os.path.join('/Users', 'juliusniemeyer', 'Library',
-                                    'Application Support', 'Anki2',
-                                    ankiusername, 'collection.media',
-                                    search_string + '_us_1.mp3')
+    # Only try to download if it's an actual URL
+    if soundurl and soundurl.startswith("http"):
+        try:
+            # Download the audio file
+            doc = requests.get(soundurl)
+            doc.raise_for_status()
+            
+            if platform == 'win32' or platform == 'win64':
+                filepath = "C:/Users/" + windowsusername + "/AppData/Roaming/Anki2/" + ankiusername + "/collection.media/" + search_string + "_us_1.mp3"
+            elif platform == 'darwin':
+                filepath = "/Users/juliusniemeyer/Library/Application Support/Anki2/" + ankiusername + "/collection.media/" + search_string + "_us_1.mp3"
+            
             with open(filepath, "wb") as f:
                 f.write(doc.content)
-    except Exception as e:
-        n[pronunciation_field] = str(e.args)
+            
+            n[pronunciation_field] = "[sound:" + search_string + "_us_1.mp3]"
+            
+        except Exception as e:
+            n[pronunciation_field] = f"Error downloading audio: {e}"
     else:
-        n[pronunciation_field] = "[sound:" + search_string + "_us_1.mp3]"
+        # If it's not a URL, just put the text (e.g., "No audio pronunciation found.") into the Anki field
+        n[pronunciation_field] = soundurl
 
     # API 3
     try:
