@@ -5,7 +5,6 @@ import requests
 import os
 from sys import platform
 from bs4 import BeautifulSoup
-import marriam_webster_fetch
 
 global editorWindow
 
@@ -64,6 +63,51 @@ twinword_key = config[
 # get key for Urbandictionary API
 urban_key = config[
     "Urban Dictionary API Key (https://rapidapi.com/community/api/urban-dictionary)"]
+
+def get_short_definition(word: str) -> str:
+    # Construct the URL
+    url = f'https://www.merriam-webster.com/dictionary/{word}'
+    print(f"Fetching: {url}")
+    
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching page: {e}")
+        return ""
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Method 1: Get all definition texts from the main dictionary entry
+    # Merriam-Webster usually wraps definitions in <span class="dtText">
+    definitions: list[str] = []
+    
+    # Check for the primary specific definitions first
+    dt_elements = soup.find_all('span', class_='dtText')
+    
+    for dt in dt_elements:
+        # Get text, strip whitespace, and remove the leading colon if present
+        text = dt.get_text().strip()
+        if text.startswith(':'):
+            text = text[1:].strip()
+        if text:
+            definitions.append(text)
+
+    # Method 2: Fallback to meta description if no specific definitions found
+    # (Sometimes useful for a quick summary)
+    if not definitions:
+        meta_desc = soup.find('meta', attrs={'name': 'description'})
+        if meta_desc:
+            content = meta_desc.get('content', '')
+            # The meta description often follows "Word definition is - ..." format
+            if ' definition is - ' in content:
+                short_part = content.split(' definition is - ')[1].split('. How to use')[0]
+                definitions.append(short_part)
+            else:
+                definitions.append(content)
+
+    return "\n".join(definitions)
+
 
 def get_deepl_translation(word :str, key: str) -> str:
     
@@ -158,7 +202,7 @@ def fill_the_fields(flag):
 
     # API 2 Marriam-Webster more information about the English word
     
-    n[english_definitions_field] = marriam_webster_fetch.get_short_definition(search_string)
+    n[english_definitions_field] = get_short_definition(search_string)
     n[examples_prepared_field] = get_example_sentence(search_string)[0]
     n[example_sentences_entry] = get_example_sentence(search_string)[1]
     soundurl = get_stuff_from_marriam_webster(search_string,marriam_webster_api_key)[1]
