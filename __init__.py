@@ -116,19 +116,24 @@ def get_pronunciation(word: str) -> str:
     return f"https://translate.google.com/translate_tts?ie=UTF-8&q={encoded_word}&tl=en&client=tw-ob"
 
 def get_deepl_translation(word :str, key: str) -> str:
-    
-    r = requests.post(
-                url="https://api-free.deepl.com/v2/translate",
-                data={
-                    'source_lang' : "EN",
-                    "target_lang": "DE",
-                    "auth_key": key,
-                    "text": word,
-                },
-            )
+    if not word or not key:
+        return ''
+
+    url = "https://api-free.deepl.com/v2/translate"
+    headers = {
+        "Authorization": f"DeepL-Auth-Key {key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "text": [word],
+        "target_lang": "DE",
+    }
+
     try:
-        return r.json()['translations'][0]['text']
-    except:
+        r = requests.post(url=url, headers=headers, json=payload)
+        r.raise_for_status()
+        return r.json()["translations"][0]["text"]
+    except Exception:
         return ''
 
 def get_example_sentence(word : str) -> list[str]:
